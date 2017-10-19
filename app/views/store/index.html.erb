@@ -1,2 +1,12 @@
-<h1>Store#index</h1>
-<p>Find me in app/views/store/index.html.erb</p>
+<h1>Welcome to BookStore</h1>
+
+<div class="products">
+  <% @products.each do |p| %>
+    <div class="product">
+      <h3><%= p.name %></h3>
+      <p class="price">
+        <%= number_to_currency p.price %>
+      </p>
+    </div>
+  <% end %>
+</div>
