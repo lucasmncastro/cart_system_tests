@@ -4,17 +4,29 @@ RSpec.describe CartController, type: :controller do
 
   describe "GET #index" do
     it "returns http success" do
-      get :index
+      u = User.create! name: 'João'
+      get :index, session: { user_id: u.id }
       expect(response).to have_http_status(:success)
     end
 
-    it "redirects to the (fake) login if the user is logged out"
+    it "redirects to the (fake) login if the user is logged out" do
+      get :index, session: { user_id: nil }
+      expect(response).to have_http_status(:redirect)
+      expect(flash[:alert]).to match(/Enter with your username/)
+    end
+
     it "creates a cart if there is no pending cart"
     it "uses the pending cart if there is one"
   end
 
   describe "GET #add" do
-    it "redirects to the (fake) login if the user is logged out"
+    it "redirects to the (fake) login if the user is logged out" do
+      p = Product.create! name: 'Book', price: 10
+      get :add, params: { product_id: p }, session: { user_id: nil }
+      expect(response).to have_http_status(:redirect)
+      expect(flash[:alert]).to match(/Enter with your username/)
+    end
+
     it "creates a cart if there is no pending open cart"
     it "uses the pending cart if there is one"
 

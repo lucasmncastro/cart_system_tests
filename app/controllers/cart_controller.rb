@@ -1,4 +1,6 @@
 class CartController < ApplicationController
+  before_action :authenticate_user!, only: [:index, :add]
+
   def index
   end
 
