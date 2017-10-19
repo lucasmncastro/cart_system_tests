@@ -15,18 +15,4 @@ RSpec.describe StoreController, type: :controller do
     end
   end
 
-  describe "GET #product" do
-    it "returns http success" do
-      product = Product.create! name: 'My Book', price: 19.10
-      get :product, params: {id: product.id}
-      expect(response).to have_http_status(:success)
-    end
-
-    it "load the product with the given :id" do
-      product = Product.create! name: 'My Book', price: 19.10
-      get :product, params: {id: product.id}
-      expect(assigns(:product)).to eq(product)
-    end
-  end
-
 end
