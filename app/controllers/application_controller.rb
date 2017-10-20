@@ -5,7 +5,7 @@ class ApplicationController < ActionController::Base
     def authenticate_user!
       if session[:user_id].blank?
         flash[:alert] = 'Enter with your username'
-        redirect_to root_path
+        redirect_to login_path
       end
     end
 end

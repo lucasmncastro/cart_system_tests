@@ -11,8 +11,7 @@ RSpec.describe CartController, type: :controller do
 
     it "redirects to the (fake) login if the user is logged out" do
       get :index, session: { user_id: nil }
-      expect(response).to have_http_status(:redirect)
-      expect(flash[:alert]).to match(/Enter with your username/)
+      expect(response).to redirect_to("/login")
     end
 
     it "creates a cart if there is no pending cart"
@@ -23,8 +22,7 @@ RSpec.describe CartController, type: :controller do
     it "redirects to the (fake) login if the user is logged out" do
       p = Product.create! name: 'Book', price: 10
       get :add, params: { product_id: p }, session: { user_id: nil }
-      expect(response).to have_http_status(:redirect)
-      expect(flash[:alert]).to match(/Enter with your username/)
+      expect(response).to redirect_to("/login")
     end
 
     it "creates a cart if there is no pending open cart"
@@ -64,7 +62,8 @@ RSpec.describe CartController, type: :controller do
 
   describe "PATCH #update" do
     it "returns http success" do
-      patch :update
+      u = User.create! name: 'João'
+      patch :update, session: { user_id: u.id }
       expect(response).to have_http_status(:success)
     end
 
@@ -77,7 +76,8 @@ RSpec.describe CartController, type: :controller do
 
   describe "PATCH #checkout" do
     it "returns http success" do
-      patch :checkout
+      u = User.create! name: 'João'
+      patch :checkout, session: { user_id: u.id }
       expect(response).to have_http_status(:success)
     end
 
