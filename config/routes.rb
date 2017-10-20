@@ -1,6 +1,7 @@
 Rails.application.routes.draw do
-  get '/login',  to: 'sessions#new'
+  get '/login', to: 'sessions#new'
   get '/logout', to: 'sessions#destroy'
+  post '/authenticate', to: 'sessions#create'
 
   get 'cart/index'
   get '/cart/add/:product_id', to: "cart#add", as: :add_cart
