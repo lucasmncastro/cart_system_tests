@@ -30,9 +30,16 @@ RSpec.describe SessionsController, type: :controller do
   end
 
   describe "GET #destroy" do
-    it "returns http success" do
-      get :destroy
-      expect(response).to have_http_status(:success)
+    it "should clear the user in the session" do
+      u = User.create! name: 'João'
+      get :destroy, session: { user_id: u.id }
+      expect(session[:user_id]).to be_nil
+    end
+
+    it "should redirect to root page" do
+      u = User.create! name: 'João'
+      get :destroy, session: { user_id: u.id }
+      expect(response).to redirect_to(root_path)
     end
   end
 

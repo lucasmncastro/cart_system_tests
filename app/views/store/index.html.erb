@@ -1,4 +1,10 @@
-<h1>Welcome to BookStore</h1>
+<h1>BookStore</h1>
+
+<p>
+<% if @current_user %>
+  Welcome, <%= @current_user.name %>! <%= link_to 'Log out', logout_path %>
+<% end %>
+</p>
 
 <div class="products">
   <% @products.each do |p| %>
