@@ -47,9 +47,6 @@ RSpec.describe CartController, type: :controller do
       expect(response).to redirect_to("/login")
     end
 
-    it "creates a cart if there is no pending open cart"
-    it "uses the pending cart if there is one"
-
     it "expires the cart is already passed more than 2 days" do
       u = User.create! name: 'João'
       c = Cart.create! user: u, status: :pending, created_at: Date.today - 2.days - 1.minute
@@ -133,9 +130,6 @@ RSpec.describe CartController, type: :controller do
         c.reload
         expect(c.items.size).to eq(0)
       end
-
-      it "redirects to the store"
-      it "shows a flash message"
     end
 
     describe "with 'checkout' submit" do
