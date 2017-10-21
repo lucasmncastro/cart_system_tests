@@ -2,6 +2,7 @@ class CartController < ApplicationController
   before_action :authenticate_user!
 
   def index
+    @cart = @current_user.carts.find_or_create_by!(status: 'pending')
   end
 
   def add
@@ -17,8 +18,17 @@ class CartController < ApplicationController
   end
 
   def update
+    @cart = @current_user.carts.find_by(status: :pending)
+    @cart.update! cart_params
+    redirect_to root_path
   end
 
   def checkout
   end
+
+  private
+
+    def cart_params
+      params.require(:cart).permit(items_attributes: [:id, :quantity])
+    end
 end

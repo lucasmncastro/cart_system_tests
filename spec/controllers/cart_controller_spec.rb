@@ -14,8 +14,22 @@ RSpec.describe CartController, type: :controller do
       expect(response).to redirect_to("/login")
     end
 
-    it "creates a cart if there is no pending cart"
-    it "uses the pending cart if there is one"
+    it "creates a cart if there is no pending cart" do
+      u  = User.create! name: 'João'
+      c1 = Cart.create! user: u, status: :finished
+      get :index, session: { user_id: u.id }
+      expect(assigns(:cart)).to_not eq(c1)
+      expect(assigns(:cart).status).to eq('pending')
+    end
+
+    it "uses the pending cart if there is one" do
+      u  = User.create! name: 'João'
+      c1 = Cart.create! user: u, status: :pending
+      c2 = Cart.create! user: u, status: :finished
+      get :index, session: { user_id: u.id }
+      expect(assigns(:cart)).to eq(c1)
+    end
+
   end
 
   describe "GET #add" do
@@ -61,13 +75,30 @@ RSpec.describe CartController, type: :controller do
   end
 
   describe "PATCH #update" do
-    it "returns http success" do
+    it "redirect after update successfully" do
+      p = Product.create! name: 'Book', price: 10
       u = User.create! name: 'João'
-      patch :update, session: { user_id: u.id }
-      expect(response).to have_http_status(:success)
+      c = Cart.create! user: u
+      i = c.items.create! product: p, quantity: 5
+
+      post_params = { cart: { items_attributes: { '0' => { id: i.id, quantity: 3 } } } }
+      patch :update, params: post_params, session: { user_id: u.id }
+
+      expect(response).to have_http_status(:redirect)
     end
 
-    it "updates the cart items when the user change the quantity of an item"
+    it "updates the cart items when the user change the quantity of an item" do
+      p = Product.create! name: 'Book', price: 10
+      u = User.create! name: 'João'
+      c = Cart.create! user: u
+      i = c.items.create! product: p, quantity: 5
+
+      post_params = { cart: { items_attributes: { '0' => { id: i.id, quantity: 3 } } } }
+      patch :update, params: post_params, session: { user_id: u.id }
+      i.reload
+      expect(i.quantity).to eq(3)
+    end
+
     it "updates the cart items when the user remove an item"
 
     it "redirects to the store"

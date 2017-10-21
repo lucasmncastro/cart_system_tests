@@ -18,6 +18,12 @@ RSpec.describe "store/index.html.erb", type: :view do
     expect(rendered).to include(link_to("Add to cart", add_cart_path(product_id: p2))) 
   end
 
+  it "display 'My cart' link" do
+    assign(:products, [])
+    render
+    expect(rendered).to include(link_to("My cart", cart_path)) 
+  end
+
   describe "when the user is logged in" do
     it "should display his name" do
       products = [Product.create!(name: 'Book 1', price: 10), Product.create!(name: 'Book 2', price: 20)]
