@@ -30,6 +30,14 @@ RSpec.describe CartController, type: :controller do
       expect(assigns(:cart)).to eq(c1)
     end
 
+    it "expires the cart is already passed more than 2 days" do
+      u = User.create! name: 'João'
+      c = Cart.create! user: u, status: :pending, created_at: Date.today - 2.days - 1.minute
+      get :index, session: { user_id: u.id }
+      expect(assigns(:cart)).to be_present
+      expect(assigns(:cart)).to_not eq(c)
+    end
+
   end
 
   describe "GET #add" do
@@ -41,6 +49,15 @@ RSpec.describe CartController, type: :controller do
 
     it "creates a cart if there is no pending open cart"
     it "uses the pending cart if there is one"
+
+    it "expires the cart is already passed more than 2 days" do
+      u = User.create! name: 'João'
+      c = Cart.create! user: u, status: :pending, created_at: Date.today - 2.days - 1.minute
+      p = Product.create! name: 'Book', price: 10
+      get :add, params: { product_id: p }, session: { user_id: u.id }
+      expect(assigns(:cart)).to be_present
+      expect(assigns(:cart)).to_not eq(c)
+    end
 
     it "adds a new product to the cart" do
       u = User.create! name: 'João'

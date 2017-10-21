@@ -1,14 +1,11 @@
 class CartController < ApplicationController
   before_action :authenticate_user!
+  before_action :load_or_create_cart, only: [:index, :add]
 
   def index
-    @cart = @current_user.carts.find_or_create_by!(status: 'pending')
   end
 
   def add
-    @user = User.find(session[:user_id])
-    @cart = @user.carts.find_or_create_by!(status: :pending)
-
     item = @cart.items.find_or_initialize_by(product_id: params[:product_id])
     item.quantity += 1 if item.persisted?
     item.save!
@@ -35,5 +32,13 @@ class CartController < ApplicationController
 
     def cart_params
       params.require(:cart).permit(items_attributes: [:id, :quantity, :_destroy])
+    end
+
+    def load_or_create_cart
+      @cart = @current_user.carts.find_or_create_by!(status: 'pending')
+      if @cart.verify_expired?
+        @cart.mark_as_expired!
+        @cart = @current_user.carts.create!(status: 'pending')
+      end
     end
 end
