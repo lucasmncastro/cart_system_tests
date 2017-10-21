@@ -99,7 +99,17 @@ RSpec.describe CartController, type: :controller do
       expect(i.quantity).to eq(3)
     end
 
-    it "updates the cart items when the user remove an item"
+    it "updates the cart items when the user remove an item" do
+      p = Product.create! name: 'Book', price: 10
+      u = User.create! name: 'João'
+      c = Cart.create! user: u
+      i = c.items.create! product: p, quantity: 5
+
+      post_params = { cart: { items_attributes: { '0' => { id: i.id, quantity: 3, _destroy: true } } } }
+      patch :update, params: post_params, session: { user_id: u.id }
+      c.reload
+      expect(c.items.size).to eq(0)
+    end
 
     it "redirects to the store"
     it "shows a flash message"

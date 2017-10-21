@@ -5,7 +5,10 @@
     <ul>
       <%= f.fields_for :items do |i| %>
         <%= i.hidden_field :id %>
-        <li> <%= i.object.product.name %>: <%= i.text_field :quantity %></li>
+        <li> 
+          <%= i.object.product.name %>: <%= i.text_field :quantity %>
+          <label><%= i.check_box :_destroy %> remove product</label>
+        </li>
       <% end %>
     </ul>
     <%= f.submit "Update and continue buying" %>

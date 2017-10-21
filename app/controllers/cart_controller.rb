@@ -29,6 +29,6 @@ class CartController < ApplicationController
   private
 
     def cart_params
-      params.require(:cart).permit(items_attributes: [:id, :quantity])
+      params.require(:cart).permit(items_attributes: [:id, :quantity, :_destroy])
     end
 end
