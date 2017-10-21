@@ -19,11 +19,16 @@ class CartController < ApplicationController
 
   def update
     @cart = @current_user.carts.find_by(status: :pending)
-    @cart.update! cart_params
-    redirect_to root_path
+    if params[:commit] == 'Checkout'
+      @cart.update! cart_params.merge(status: 'finished')
+      redirect_to thanks_path
+    else
+      @cart.update! cart_params
+      redirect_to root_path
+    end
   end
 
-  def checkout
+  def thanks
   end
 
   private

@@ -42,6 +42,17 @@ RSpec.describe "cart/index.html.erb", type: :view do
     c.items.create! product: p1
     assign(:cart, c)
     render
-    expect(rendered).to include('Update and continue')
+    expect(rendered).to include(submit_tag('Update and continue buying'))
+  end
+
+  it "displays the Checkout button" do
+    p1 = Product.create! name: 'My favorite book', price: 39
+    p2 = Product.create! name: 'My almost favorite book', price: 29
+    u = User.create! name: 'João'
+    c = u.carts.create!
+    c.items.create! product: p1
+    assign(:cart, c)
+    render
+    expect(rendered).to include(submit_tag('Checkout'))
   end
 end

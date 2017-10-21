@@ -75,55 +75,74 @@ RSpec.describe CartController, type: :controller do
   end
 
   describe "PATCH #update" do
-    it "redirect after update successfully" do
-      p = Product.create! name: 'Book', price: 10
-      u = User.create! name: 'João'
-      c = Cart.create! user: u
-      i = c.items.create! product: p, quantity: 5
 
-      post_params = { cart: { items_attributes: { '0' => { id: i.id, quantity: 3 } } } }
-      patch :update, params: post_params, session: { user_id: u.id }
+    describe "with 'save' submit" do
+      it "redirect after update successfully" do
+        p = Product.create! name: 'Book', price: 10
+        u = User.create! name: 'João'
+        c = Cart.create! user: u
+        i = c.items.create! product: p, quantity: 5
 
-      expect(response).to have_http_status(:redirect)
+        post_params = { cart: { items_attributes: { '0' => { id: i.id, quantity: 3 } } } }
+        patch :update, params: post_params, session: { user_id: u.id }
+
+        expect(response).to have_http_status(:redirect)
+      end
+
+      it "updates the cart items when the user change the quantity of an item" do
+        p = Product.create! name: 'Book', price: 10
+        u = User.create! name: 'João'
+        c = Cart.create! user: u
+        i = c.items.create! product: p, quantity: 5
+
+        post_params = { cart: { items_attributes: { '0' => { id: i.id, quantity: 3 } } } }
+        patch :update, params: post_params, session: { user_id: u.id }
+        i.reload
+        expect(i.quantity).to eq(3)
+      end
+
+      it "updates the cart items when the user remove an item" do
+        p = Product.create! name: 'Book', price: 10
+        u = User.create! name: 'João'
+        c = Cart.create! user: u
+        i = c.items.create! product: p, quantity: 5
+
+        post_params = { cart: { items_attributes: { '0' => { id: i.id, quantity: 3, _destroy: true } } } }
+        patch :update, params: post_params, session: { user_id: u.id }
+        c.reload
+        expect(c.items.size).to eq(0)
+      end
+
+      it "redirects to the store"
+      it "shows a flash message"
     end
 
-    it "updates the cart items when the user change the quantity of an item" do
-      p = Product.create! name: 'Book', price: 10
-      u = User.create! name: 'João'
-      c = Cart.create! user: u
-      i = c.items.create! product: p, quantity: 5
+    describe "with 'checkout' submit" do
+      it "changes the cart status to finished" do
+        p = Product.create! name: 'Book', price: 10
+        u = User.create! name: 'João'
+        c = Cart.create! user: u
+        i = c.items.create! product: p, quantity: 5
 
-      post_params = { cart: { items_attributes: { '0' => { id: i.id, quantity: 3 } } } }
-      patch :update, params: post_params, session: { user_id: u.id }
-      i.reload
-      expect(i.quantity).to eq(3)
+        post_params = { commit: 'Checkout', cart: { items_attributes: { '0' => { id: i.id, quantity: 4 } } } }
+        patch :update, params: post_params, session: { user_id: u.id }
+
+        c.reload
+        expect(c.status).to eq('finished')
+      end
+
+      it "shows the super-charged fantabolastic thanks!" do
+        p = Product.create! name: 'Book', price: 10
+        u = User.create! name: 'João'
+        c = Cart.create! user: u
+        i = c.items.create! product: p, quantity: 5
+
+        post_params = { commit: 'Checkout', cart: { items_attributes: { '0' => { id: i.id, quantity: 4 } } } }
+        patch :update, params: post_params, session: { user_id: u.id }
+
+        expect(response).to redirect_to(:thanks)
+      end
     end
-
-    it "updates the cart items when the user remove an item" do
-      p = Product.create! name: 'Book', price: 10
-      u = User.create! name: 'João'
-      c = Cart.create! user: u
-      i = c.items.create! product: p, quantity: 5
-
-      post_params = { cart: { items_attributes: { '0' => { id: i.id, quantity: 3, _destroy: true } } } }
-      patch :update, params: post_params, session: { user_id: u.id }
-      c.reload
-      expect(c.items.size).to eq(0)
-    end
-
-    it "redirects to the store"
-    it "shows a flash message"
-  end
-
-  describe "PATCH #checkout" do
-    it "returns http success" do
-      u = User.create! name: 'João'
-      patch :checkout, session: { user_id: u.id }
-      expect(response).to have_http_status(:success)
-    end
-
-    it "changes the cart status to finished"
-    it "shows the super-charged fantabolastic thanks!"
   end
 
 end

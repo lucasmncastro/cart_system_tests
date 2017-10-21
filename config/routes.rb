@@ -4,9 +4,9 @@ Rails.application.routes.draw do
   post '/authenticate', to: 'sessions#create'
 
   get 'cart', to: 'cart#index'
+  get 'thanks', to: 'cart#thanks'
   get '/cart/add/:product_id', to: "cart#add", as: :add_cart
   patch 'cart/update'
-  patch 'cart/checkout'
 
   root 'store#index'
 
