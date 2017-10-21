@@ -14,4 +14,26 @@ class Cart < ApplicationRecord
   def mark_as_expired!
     update! status: 'expired'
   end
+
+  def outdated?
+    old_unit_sum     = items.map(&:unit_price).sum
+    current_unit_sum = items.map { |i| i.product.price }.sum
+    old_unit_sum != current_unit_sum
+  end
+
+  def accept_changes! 
+    items.each do |i|
+      if i.product.price != i.unit_price
+        i.save!
+      end
+    end
+  end
+
+  def reject_changes!
+    items.each do |i|
+      if i.product.price != i.unit_price
+        i.delete
+      end
+    end
+  end
 end

@@ -1,6 +1,7 @@
 class CartController < ApplicationController
   before_action :authenticate_user!
-  before_action :load_or_create_cart, only: [:index, :add]
+  before_action :set_cart, only: [:index, :add, :accept_changes, :reject_changes, :outdated]
+  before_action :check_outdated_cart, only: [:index, :add]
 
   def index
   end
@@ -28,17 +29,19 @@ class CartController < ApplicationController
   def thanks
   end
 
+  def accept_changes
+    @cart.accept_changes!
+    redirect_to root_path
+  end
+
+  def reject_changes
+    @cart.reject_changes!
+    redirect_to root_path
+  end
+
   private
 
     def cart_params
       params.require(:cart).permit(items_attributes: [:id, :quantity, :_destroy])
-    end
-
-    def load_or_create_cart
-      @cart = @current_user.carts.find_or_create_by!(status: 'pending')
-      if @cart.verify_expired?
-        @cart.mark_as_expired!
-        @cart = @current_user.carts.create!(status: 'pending')
-      end
     end
 end

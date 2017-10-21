@@ -71,8 +71,12 @@ RSpec.describe CartController, type: :controller do
     it "increments the quantity of a product already added" do
       u = User.create! name: 'João'
       p = Product.create! name: 'Book', price: 10
+
       get :add, params: { product_id: p }, session: { user_id: u.id }
+      expect(assigns(:cart).items.first.quantity).to eq(1)
+
       get :add, params: { product_id: p }, session: { user_id: u.id }
+      assigns(:cart).reload
       expect(assigns(:cart).items.first.quantity).to eq(2)
     end
 
@@ -158,6 +162,37 @@ RSpec.describe CartController, type: :controller do
         patch :update, params: post_params, session: { user_id: u.id }
 
         expect(response).to redirect_to(:thanks)
+      end
+    end
+  end
+
+  describe "when the prices have changed" do
+    before(:each) do
+      @user = User.create! name: 'João'
+      p = Product.create! name: 'My favorite book', price: 39
+      c = @user.carts.create!
+      c.items.create! product: p
+      p.update price: 49
+    end
+
+    describe "GET #outdated" do
+      it "should load the cart to show the differences" do
+        get :outdated, session: { user_id: @user.id }
+        expect(response).to have_http_status(:success)
+      end
+    end
+
+    describe "GET #accept_changes" do
+      it "should update the items with prices" do
+        get :accept_changes, session: { user_id: @user.id }
+        expect(CartItem.first.unit_price).to eq(49)
+      end
+    end
+
+    describe "GET #reject_changes" do
+      it "should remove the items with prices changes from the cart" do
+        get :reject_changes, session: { user_id: @user.id }
+        expect(CartItem.count).to eq(0)
       end
     end
   end

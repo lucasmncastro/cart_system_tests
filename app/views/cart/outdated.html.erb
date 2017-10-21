@@ -1,0 +1,21 @@
+<h1>We are so sorry, but we changed some prices!</h1>
+
+<% @cart.items.each do |i| %>
+  <% if i.unit_price != i.product.price %>
+    <div>
+      <h3><%= i.product.name %></h3>
+      <p>
+      Before: <%= number_to_currency i.unit_price %>
+      Today: <%= number_to_currency i.product.price %>
+    </p>
+    </div>
+  <% end %>
+<% end %>
+
+<p>
+Please, click on Accept to keep those items in the cart or Reject to remove them:
+</p>
+<p>
+  <%= link_to "Accept", accept_changes_cart_path %> | 
+  <%= link_to "Reject", reject_changes_cart_path %>
+</p>

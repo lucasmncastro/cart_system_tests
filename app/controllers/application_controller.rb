@@ -12,9 +12,25 @@ class ApplicationController < ActionController::Base
     end
 
     def set_current_user
-      if session[:user_id]
-        @current_user = User.find(session[:user_id])
+      return unless session[:user_id]
+      @current_user ||= User.find(session[:user_id])
+    end
+
+    def set_cart
+      return unless @current_user
+
+      @cart = @current_user.carts.find_or_create_by!(status: 'pending')
+      if @cart.verify_expired?
+        @cart.mark_as_expired!
+        @cart = @current_user.carts.create!(status: 'pending')
       end
-      return true
+    end
+
+    def check_outdated_cart
+      return unless @cart
+
+      if @cart.outdated?
+        redirect_to outdated_cart_path
+      end
     end
 end
