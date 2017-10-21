@@ -5,6 +5,10 @@ class Cart < ApplicationRecord
 
   enum status: %w(pending expired finished)
 
+  def total
+    items.sum(:total_price)
+  end
+
   def verify_expired?
     return false if created_at.blank?
 
